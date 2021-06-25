@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
-          color: Colors.blue,
+          color: Colors.white,
         ),
         backgroundColor: Colors.blue,
         onPressed: () => showModalBottomSheet(
