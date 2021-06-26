@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,6 +12,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var _taskController;
+
+  void saveData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+  }
 
   @override
   void initState() {
@@ -112,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'ADD',
                             style: GoogleFonts.montserrat(),
                           ),
-                          onPressed: () => print('add pressed'),
+                          onPressed: () => saveData,
                         ),
                       ),
                     ],
