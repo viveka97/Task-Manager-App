@@ -2,8 +2,28 @@ import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   static const routeName = '/home_screen';
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  var _taskController;
+
+  @override
+  void initState() {
+    super.initState();
+    _taskController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _taskController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,11 +72,50 @@ class HomeScreen extends StatelessWidget {
                   height: 20.0,
                 ),
                 TextField(
+                  controller: _taskController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                       borderSide: BorderSide(color: Colors.blue),
                     ),
+                    fillColor: Colors.white,
+                    filled: true,
+                    hintText: 'Enter Task ',
+                    hintStyle: GoogleFonts.montserrat(),
+                  ),
+                ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  width: MediaQuery.of(context).size.width,
+                  height: 200.0,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: (MediaQuery.of(context).size.width / 2) - 20,
+                        child: RaisedButton(
+                          color: Colors.red,
+                          child: Text(
+                            'RESET',
+                            style: GoogleFonts.montserrat(),
+                          ),
+                          onPressed: () => _taskController.text = '',
+                        ),
+                      ),
+                      Container(
+                        width: (MediaQuery.of(context).size.width / 2) - 20,
+                        child: RaisedButton(
+                          color: Colors.blue,
+                          child: Text(
+                            'ADD',
+                            style: GoogleFonts.montserrat(),
+                          ),
+                          onPressed: () => print('add pressed'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
