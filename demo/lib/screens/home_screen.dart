@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:google_fonts/google_fonts.dart';
+import '../model/task.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home_screen';
@@ -15,6 +16,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void saveData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    Task t = Task.fromString(_taskController.text);
+    // prefs.setString('task', json.encode(t.getMap()));
+    // _taskController.text = '';
+    String tasks = prefs.getString('task');
+    List list = json.decode(tasks);
   }
 
   @override
