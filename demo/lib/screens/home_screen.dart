@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../model/task.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const routeName = '/home_screen';
+  static const routeName = '/home-screen';
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -18,9 +18,15 @@ class _HomeScreenState extends State<HomeScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Task t = Task.fromString(_taskController.text);
     // prefs.setString('task', json.encode(t.getMap()));
-    // _taskController.text = '';
-    String tasks = prefs.getString('task');
-    List list = json.decode(tasks);
+    //  _taskController.text = '';
+    String? tasks = prefs.getString('task');
+    List list = (tasks == null) ? [] : json.decode(tasks);
+    print(list);
+    list.add(json.encode(t.getMap()));
+    print(list);
+    prefs.setString('task', json.encode(list));
+    _taskController.text = '';
+    Navigator.of(context).pop();
   }
 
   @override
@@ -117,8 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Container(
                         width: (MediaQuery.of(context).size.width / 2) - 20,
-                        child: RaisedButton(
-                          color: Colors.blue,
+                        child: ElevatedButton(
                           child: Text(
                             'ADD',
                             style: GoogleFonts.montserrat(),
