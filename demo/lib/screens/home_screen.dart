@@ -41,6 +41,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _taskController = TextEditingController();
+  // }
+
+  // @override
+  // void dispose() {
+  //   _taskController.dispose();
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
