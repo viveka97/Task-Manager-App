@@ -2,7 +2,7 @@ class Task {
   String task;
   DateTime time;
 
-  Task({required this.task, required this.time});
+  Task({this.task, this.time});
 
   factory Task.fromString(String task) {
     return Task(

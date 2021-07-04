@@ -1,7 +1,9 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../model/task.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,13 +15,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var _taskController;
+  List<Task> _tasks;
+  List<bool> _tasksDone;
 
   void saveData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Task t = Task.fromString(_taskController.text);
-    // prefs.setString('task', json.encode(t.getMap()));
-    //  _taskController.text = '';
-    String? tasks = prefs.getString('task');
+    String tasks = prefs.getString('task');
     List list = (tasks == null) ? [] : json.decode(tasks);
     print(list);
     list.add(json.encode(t.getMap()));
@@ -27,12 +29,45 @@ class _HomeScreenState extends State<HomeScreen> {
     prefs.setString('task', json.encode(list));
     _taskController.text = '';
     Navigator.of(context).pop();
+
+    _getTasks();
+  }
+
+  void _getTasks() async {
+    _tasks = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String tasks = prefs.getString('task');
+    List list = (tasks == null) ? [] : json.decode(tasks);
+    for (dynamic d in list) {
+      _tasks.add(Task.fromMap(json.decode(d)));
+    }
+
+    print(_tasks);
+
+    _tasksDone = List.generate(_tasks.length, (index) => false);
+    setState(() {});
+  }
+
+  void updatePendingTasksList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<Task> pendingList = [];
+    for (var i = 0; i < _tasks.length; i++)
+      if (!_tasksDone[i]) pendingList.add(_tasks[i]);
+
+    var pendingListEncoded = List.generate(
+        pendingList.length, (i) => json.encode(pendingList[i].getMap()));
+
+    prefs.setString('task', json.encode(pendingListEncoded));
+
+    _getTasks();
   }
 
   @override
   void initState() {
     super.initState();
     _taskController = TextEditingController();
+
+    _getTasks();
   }
 
   @override
@@ -40,18 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _taskController.dispose();
     super.dispose();
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _taskController = TextEditingController();
-  // }
-
-  // @override
-  // void dispose() {
-  //   _taskController.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +84,65 @@ class _HomeScreenState extends State<HomeScreen> {
           'Task Manager',
           style: GoogleFonts.montserrat(),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: updatePendingTasksList,
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setString('task', json.encode([]));
+
+              _getTasks();
+            },
+          ),
+        ],
       ),
-      body: Center(
-        child: Text('No Tasks added yet!'),
-      ),
+      body: (_tasks == null)
+          ? Center(
+              child: Text('No Tasks added yet!'),
+            )
+          : Column(
+              children: _tasks
+                  .map((e) => Container(
+                        height: 70.0,
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 5.0,
+                        ),
+                        padding: const EdgeInsets.only(left: 10.0),
+                        alignment: Alignment.centerLeft,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              e.task,
+                              style: GoogleFonts.montserrat(),
+                            ),
+                            Checkbox(
+                              value: _tasksDone[_tasks.indexOf(e)],
+                              key: GlobalKey(),
+                              onChanged: (val) {
+                                setState(() {
+                                  _tasksDone[_tasks.indexOf(e)] = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ))
+                  .toList(),
+            ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
@@ -75,6 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           builder: (BuildContext context) => Container(
             padding: const EdgeInsets.all(10.0),
+            height: 250,
             color: Colors.blue[200],
             child: Column(
               children: [
@@ -82,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Add Task',
+                      'Add task',
                       style: GoogleFonts.montserrat(
                         color: Colors.white,
                         fontSize: 20.0,
@@ -94,12 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                Divider(
-                  thickness: 1.2,
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                Divider(thickness: 1.2),
+                SizedBox(height: 20.0),
                 TextField(
                   controller: _taskController,
                   decoration: InputDecoration(
@@ -109,23 +184,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     fillColor: Colors.white,
                     filled: true,
-                    hintText: 'Enter Task ',
+                    hintText: 'Enter task',
                     hintStyle: GoogleFonts.montserrat(),
                   ),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   width: MediaQuery.of(context).size.width,
-                  height: 200.0,
+                  // height: 200.0,
                   child: Row(
                     children: [
                       Container(
                         width: (MediaQuery.of(context).size.width / 2) - 20,
                         child: RaisedButton(
-                          color: Colors.red,
+                          color: Colors.white,
                           child: Text(
                             'RESET',
                             style: GoogleFonts.montserrat(),
@@ -135,12 +208,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Container(
                         width: (MediaQuery.of(context).size.width / 2) - 20,
-                        child: ElevatedButton(
+                        child: RaisedButton(
+                          color: Colors.blue,
                           child: Text(
                             'ADD',
                             style: GoogleFonts.montserrat(),
                           ),
-                          onPressed: () => saveData,
+                          onPressed: () => saveData(),
                         ),
                       ),
                     ],
