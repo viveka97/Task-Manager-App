@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           builder: (BuildContext context) => Container(
             padding: const EdgeInsets.all(10.0),
-            height: 250,
+            height: 2000,
             color: Colors.blue[200],
             child: Column(
               children: [
@@ -198,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Container(
                         width: (MediaQuery.of(context).size.width / 2) - 20,
                         child: RaisedButton(
-                          color: Colors.white,
+                          color: Colors.red,
                           child: Text(
                             'RESET',
                             style: GoogleFonts.montserrat(),
